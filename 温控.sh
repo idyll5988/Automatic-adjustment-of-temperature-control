@@ -12,7 +12,7 @@ while true; do
 screen_status=$(dumpsys window | grep "mScreenOn" | grep true)
 if [[ "${screen_status}" ]]; then
 echo "$date *📲- 亮屏运行*" 
-    temperature=$(dumpsys battery | grep 'temperature' | awk -F ": " '{print $2}')
+    temperature=$(su -c dumpsys battery | grep 'temperature' | awk -F ": " '{print $2}')
     if [ $? -eq 0 ]; then
 	
         temperature=$(echo "scale=1; $temperature / 10" | bc)
