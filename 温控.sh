@@ -2,11 +2,22 @@
 THERMAL_STATUS_NONE=0
 THERMAL_STATUS_LIGHT=1
 THERMAL_STATUS_MODERATE=2
+THERMAL_STATUS_SEVERE=3
 set_cmd() {
     su -c "cmd device_config put $1 $2 $3" > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "$(date "+%Y年%m月%d日%H时%M分%S秒") *执行命令成功: cmd device_config put $1 $2 $3*" 
+    else
+        echo "$(date "+%Y年%m月%d日%H时%M分%S秒") *执行命令失败: cmd device_config put $1 $2 $3*" 
+    fi
 }
 set_thermal_status() {
     su -c "cmd thermalservice override-status $1" > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "$(date "+%Y年%m月%d日%H时%M分%S秒") *执行命令成功: cmd thermalservice override-status $1*" 
+    else
+        echo "$(date "+%Y年%m月%d日%H时%M分%S秒") *执行命令失败: cmd thermalservice override-status $1*" 
+    fi
 }
 get_battery_temperature() {
     local temperature
@@ -41,7 +52,7 @@ while true; do
                     set_cmd power set-fixed-performance-mode-enabled true
                     ;;
                 35|36)
-                    set_thermal_status $THERMAL_STATUS_NONE
+                    set_thermal_status $THERMAL_STATUS_LIGHT
                     set_cmd power set-adaptive-power-saver-enabled true
                     set_cmd power set-fixed-performance-mode-enabled false
                     ;;
@@ -50,13 +61,13 @@ while true; do
                     set_cmd power set-adaptive-power-saver-enabled true
                     set_cmd power set-fixed-performance-mode-enabled false
                     ;;
-                39|40)
-                    set_thermal_status $THERMAL_STATUS_LIGHT
+                39|40|41)
+                    set_thermal_status $THERMAL_STATUS_MODERATE
                     set_cmd power set-adaptive-power-saver-enabled true
                     set_cmd power set-fixed-performance-mode-enabled false
                     ;;
-                41|42|43|44)
-                    set_thermal_status $THERMAL_STATUS_MODERATE
+                42|43|44)
+                    set_thermal_status $THERMAL_STATUS_SEVERE
                     set_cmd power set-adaptive-power-saver-enabled true
                     set_cmd power set-fixed-performance-mode-enabled false
                     ;;
